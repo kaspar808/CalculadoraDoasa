@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>Untitled</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"><link rel="stylesheet" href="./style.css">
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<div class="app-container">
+  <!-- Encabezado tipo tarjeta -->
+  <div class="plato-card">
+    <div class="card-header">
+      <div class="image-upload">
+        <div class="image-preview" id="imagePreview">
+          <i class="fas fa-camera"></i>
+          <span>+ Agregar foto</span>
+        </div>
+        <input type="file" id="platoImage" accept="image/*">
+      </div>
+      <div class="card-info">
+        <input type="text" id="platoNombre" placeholder="Nombre del plato" class="card-title">
+        <textarea id="platoDescripcion" placeholder="Descripción del plato..."></textarea>
+      </div>
+    </div>
+
+    <div class="card-meta">
+      <div class="meta-item">
+        <label>Dificultad</label>
+        <select id="dificultad">
+          <option value="1">🔥 Fácil</option>
+          <option value="2">🔥🔥 Media</option>
+          <option value="3">🔥🔥🔥 Difícil</option>
+        </select>
+      </div>
+      <div class="meta-item">
+        <label>⏱️ Tiempo (min)</label>
+        <input type="number" id="tiempoPreparacion" min="0">
+      </div>
+      <div class="meta-item">
+        <label>🌡️ Temp. (°C)</label>
+        <input type="number" id="temperatura" min="0">
+      </div>
+    </div>
+  </div>
+
+  <!-- Sección de Ingredientes -->
+  <div class="section ingredientes">
+    <h2>🥩 Ingredientes</h2>
+
+    <div class="form-ingrediente">
+      <div class="form-row">
+        <input type="text" id="ingredienteNombre" placeholder="Nombre">
+        <input type="number" id="ingredienteCantidad" placeholder="Cant. por porción" min="0" step="0.1">
+        <select id="ingredienteUnidad">
+          <option value="gr">gr</option>
+          <option value="kg">kg</option>
+          <option value="un">un</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <input type="text" id="ingredientePresentacion" placeholder="Presentación compra (ej: 1kg)">
+        <input type="number" id="ingredientePrecio" placeholder="Precio ($ARS)" min="0" step="0.01">
+        <button id="agregarIngrediente" class="btn-add">
+          <i class="fas fa-plus"></i> Agregar
+        </button>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table id="tablaIngredientes">
+        <thead>
+          <tr>
+            <th>Ingrediente</th>
+            <th>Cant.</th>
+            <th>Precio</th>
+            <th>Costo</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="ingredientesBody"></tbody> <!-- ID añadido aquí -->
+      </table>
+      <div class="table-footer">
+        <span>Total ingredientes:</span>
+        <span id="totalIngredientes">$0.00</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sección de Costos Operativos -->
+  <div class="section costos">
+    <h2>⚙️ Costos Operativos</h2>
+
+    <div class="form-costo">
+      <div class="form-row">
+        <input type="text" id="costoConcepto" placeholder="Concepto (ej: Carbón)">
+        <input type="number" id="costoValor" placeholder="Valor ($ARS)" min="0" step="0.01">
+        <button id="agregarCosto" class="btn-add">
+          <i class="fas fa-plus"></i> Agregar
+        </button>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table id="tablaCostos">
+        <thead>
+          <tr>
+            <th>Concepto</th>
+            <th>Valor</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="costosBody"></tbody> <!-- ID añadido aquí -->
+      </table>
+      <div class="table-footer">
+        <span>Total costos:</span>
+        <span id="totalCostos">$0.00</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Resultados y Acciones -->
+  <div class="section resultados">
+    <h2>📊 Resultados</h2>
+    <div class="result-grid">
+      <div class="result-card">
+        <h3>Costo por plato</h3>
+        <div class="result-value" id="costoPlato">$0.00</div>
+      </div>
+
+      <div class="result-card">
+        <div class="input-group">
+          <label for="margenGanancia">Margen (%)</label>
+          <input type="number" id="margenGanancia" value="100" min="0">
+        </div>
+      </div>
+
+      <div class="result-card">
+        <div class="input-group">
+          <label for="comensales">Comensales</label>
+          <input type="number" id="comensales" value="1" min="1">
+        </div>
+      </div>
+
+      <div class="result-card highlight">
+        <h3>Precio por persona</h3>
+        <div class="result-value" id="precioPersona">$0.00</div>
+      </div>
+
+      <div class="result-card highlight">
+        <h3>Total para <span id="numComensales">1</span> comensal(es)</h3>
+        <div class="result-value" id="precioTotal">$0.00</div>
+      </div>
+    </div>
+
+    <div class="action-buttons">
+      <button id="exportarPDF" class="btn-action pdf">
+        <i class="fas fa-file-pdf"></i> Guardar PDF
+      </button>
+      <button id="compartirReceta" class="btn-action share">
+        <i class="fas fa-share-alt"></i> Compartir
+      </button>
+    </div>
+  </div>
+<!-- partial -->
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'></script><script  src="./script.js"></script>
+
+</body>
+</html>

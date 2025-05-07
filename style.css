@@ -1,0 +1,386 @@
+/* Configuración base para CodePen */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css");
+
+/* Variables de color */
+:root {
+  --color1: #f7f6e4;
+  --color2: #e2d5c1;
+  --color3: #5f3711;
+  --color4: #f6f6e2;
+  --color5: #d4c098;
+  --border-radius: 10px;
+  --box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --transition: all 0.3s ease;
+}
+
+/* Reset y estilos base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  background-color: var(--color1);
+  color: #333;
+  line-height: 1.6;
+  padding: 20px;
+}
+
+.app-container {
+  max-width: 800px;
+  margin: 0 auto;
+  background-color: var(--color4);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  padding: 25px;
+}
+
+h2 {
+  color: var(--color3);
+  margin: 25px 0 15px;
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Tarjeta del plato */
+.plato-card {
+  background-color: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  overflow: hidden;
+  margin-bottom: 25px;
+}
+
+.card-header {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 20px;
+}
+
+@media (min-width: 600px) {
+  .card-header {
+    flex-direction: row;
+  }
+}
+
+.image-upload {
+  width: 100%;
+  max-width: 250px;
+  position: relative;
+}
+
+.image-preview {
+  height: 180px;
+  background-color: var(--color2);
+  border: 2px dashed var(--color5);
+  border-radius: var(--border-radius);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--color3);
+}
+
+.image-preview i {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.image-preview span {
+  font-weight: 500;
+}
+
+.image-preview.has-image {
+  padding: 0;
+  border: none;
+}
+
+.image-preview.has-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-preview.has-image i,
+.image-preview.has-image span {
+  display: none;
+}
+
+.card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-title {
+  width: 100%;
+  font-size: 1.3rem;
+  font-weight: 600;
+  border: none;
+  border-bottom: 2px solid var(--color2);
+  padding: 8px 0;
+  margin-bottom: 12px;
+  color: var(--color3);
+}
+
+.card-title::placeholder {
+  color: #aaa;
+}
+
+.card-info textarea {
+  width: 100%;
+  min-height: 80px;
+  border: 1px solid var(--color2);
+  border-radius: var(--border-radius);
+  padding: 10px;
+  resize: vertical;
+}
+
+.card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  padding: 0 20px 20px;
+  background-color: var(--color2);
+}
+
+.meta-item {
+  flex: 1;
+  min-width: 120px;
+}
+
+.meta-item label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 0.9rem;
+  color: var(--color3);
+}
+
+.meta-item select,
+.meta-item input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--color5);
+  border-radius: var(--border-radius);
+  background-color: white;
+}
+
+/* Formularios */
+.form-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.form-row input,
+.form-row select {
+  flex: 1;
+  min-width: 120px;
+  padding: 10px 12px;
+  border: 1px solid var(--color2);
+  border-radius: var(--border-radius);
+  background-color: white;
+}
+
+.btn-add {
+  background-color: var(--color3);
+  color: white;
+  padding: 10px 15px;
+  border-radius: var(--border-radius);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-add:hover {
+  background-color: var(--color5);
+  color: var(--color3);
+}
+
+/* Tablas */
+.table-container {
+  overflow-x: auto;
+  margin-bottom: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+th,
+td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid var(--color2);
+}
+
+th {
+  background-color: var(--color2);
+  color: var(--color3);
+  font-weight: 600;
+}
+
+td {
+  background-color: white;
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  color: #e74c3c;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 5px;
+}
+
+.table-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 12px 15px;
+  background-color: var(--color2);
+  border-radius: 0 0 var(--border-radius) var(--border-radius);
+  font-weight: 600;
+  color: var(--color3);
+}
+
+.table-footer span:last-child {
+  margin-left: 20px;
+  color: #27ae60;
+}
+
+/* Resultados */
+.result-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.result-card {
+  background-color: white;
+  border-radius: var(--border-radius);
+  padding: 15px;
+  box-shadow: var(--box-shadow);
+}
+
+.result-card.highlight {
+  background-color: var(--color3);
+  color: white;
+}
+
+.result-card h3 {
+  font-size: 1rem;
+  margin-bottom: 10px;
+  color: inherit;
+}
+
+.result-value {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--color3);
+}
+
+.result-card.highlight .result-value {
+  color: white;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.input-group label {
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+  color: var(--color3);
+}
+
+.input-group input {
+  padding: 8px 10px;
+  border: 1px solid var(--color2);
+  border-radius: var(--border-radius);
+}
+
+/* Botones de acción */
+.action-buttons {
+  display: flex;
+  gap: 15px;
+  margin-top: 25px;
+  flex-wrap: wrap;
+}
+
+.btn-action {
+  flex: 1;
+  min-width: 150px;
+  padding: 12px 20px;
+  border-radius: var(--border-radius);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-action i {
+  font-size: 1.2rem;
+}
+
+.btn-action.pdf {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.btn-action.share {
+  background-color: #3498db;
+  color: white;
+}
+
+.btn-action:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .app-container {
+    padding: 15px;
+  }
+
+  .card-header {
+    flex-direction: column;
+  }
+
+  .image-upload {
+    max-width: 100%;
+  }
+
+  .form-row input,
+  .form-row select {
+    min-width: 100%;
+  }
+
+  .btn-add {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .result-grid {
+    grid-template-columns: 1fr;
+  }
+}
