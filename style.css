@@ -379,6 +379,26 @@ td {
     width: 100%;
     justify-content: center;
   }
+  @media (max-width: 600px) {
+  body {
+    padding: 10px !important;
+  }
+  .app-container {
+    width: 100% !important;
+    padding: 15px !important;
+  }
+  .card-header {
+    flex-direction: column;
+  }
+  .image-upload {
+    max-width: 100% !important;
+    margin-bottom: 15px;
+  }
+  .form-row input, 
+  .form-row select {
+    min-width: 100% !important;
+  }
+}
 
   .result-grid {
     grid-template-columns: 1fr;
