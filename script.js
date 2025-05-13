@@ -1,5 +1,3 @@
-// script.js COMPLETO para CodePen - Junio 2024
-
 // Variables globales
 let ingredients = [];
 let operationalCosts = [];
@@ -8,7 +6,6 @@ const STORAGE_KEY = "costeoData";
 
 // Inicialización cuando el DOM esté listo
 document.addEventListener("DOMContentLoaded", function() {
-  
   // Cargar elementos del DOM
   const ingredientesBody = document.getElementById("ingredientesBody");
   const costosBody = document.getElementById("costosBody");
@@ -107,25 +104,29 @@ document.addEventListener("DOMContentLoaded", function() {
     let total = 0;
     ingredients.forEach((ing, i) => {
       total += ing.costo;
-      ingredientesBody.innerHTML += `
-        <tr>
-          <td>${ing.nombre}</td>
-          <td>${ing.cantidad} ${ing.unidad}</td>
-          <td>$${ing.precio.toFixed(2)}</td>
-          <td>$${ing.costo.toFixed(2)}</td>
-          <td><button onclick="eliminarIngrediente(${i})"><i class="fas fa-trash"></i></button></td>
-        </tr>`;
+      const row = document.createElement("tr");
+      
+      row.innerHTML = `
+        <td>${ing.nombre}</td>
+        <td>${ing.cantidad} ${ing.unidad}</td>
+        <td>$${ing.precio.toFixed(2)}</td>
+        <td>$${ing.costo.toFixed(2)}</td>
+        <td><button class="btn-eliminar"><i class="fas fa-trash"></i></button></td>
+      `;
+      
+      row.querySelector(".btn-eliminar").addEventListener("click", () => eliminarIngrediente(i));
+      ingredientesBody.appendChild(row);
     });
     totalIngredientes.textContent = `$${total.toFixed(2)}`;
     calcularTotales();
   }
 
   // Eliminar ingrediente
-  window.eliminarIngrediente = function(i) {
+  function eliminarIngrediente(i) {
     ingredients.splice(i, 1);
     renderIngredientes();
     guardarDatos();
-  };
+  }
 
   // Agregar costo operativo
   document.getElementById("agregarCosto").addEventListener("click", function() {
@@ -150,23 +151,27 @@ document.addEventListener("DOMContentLoaded", function() {
     let total = 0;
     operationalCosts.forEach((costo, i) => {
       total += costo.valor;
-      costosBody.innerHTML += `
-        <tr>
-          <td>${costo.concepto}</td>
-          <td>$${costo.valor.toFixed(2)}</td>
-          <td><button onclick="eliminarCosto(${i})"><i class="fas fa-trash"></i></button></td>
-        </tr>`;
+      const row = document.createElement("tr");
+      
+      row.innerHTML = `
+        <td>${costo.concepto}</td>
+        <td>$${costo.valor.toFixed(2)}</td>
+        <td><button class="btn-eliminar"><i class="fas fa-trash"></i></button></td>
+      `;
+      
+      row.querySelector(".btn-eliminar").addEventListener("click", () => eliminarCosto(i));
+      costosBody.appendChild(row);
     });
     totalCostos.textContent = `$${total.toFixed(2)}`;
     calcularTotales();
   }
 
   // Eliminar costo
-  window.eliminarCosto = function(i) {
+  function eliminarCosto(i) {
     operationalCosts.splice(i, 1);
     renderCostos();
     guardarDatos();
-  };
+  }
 
   // Calcular totales
   function calcularTotales() {
@@ -316,33 +321,63 @@ document.addEventListener("DOMContentLoaded", function() {
 
   // Exportar a PDF
   document.getElementById("exportarPDF").addEventListener("click", async function() {
-    const { jsPDF } = window.jspdf;
-    const app = document.querySelector(".app-container");
-    const eraOscuro = document.body.classList.contains("modo-oscuro");
-    
-    if (eraOscuro) document.body.classList.remove("modo-oscuro");
-    
-    const canvas = await html2canvas(app, { scale: 2, scrollY: -window.scrollY });
-    const imgData = canvas.toDataURL("image/png");
-    const pdf = new jsPDF("p", "mm", "a4");
-    const imgWidth = 210;
-    const pageHeight = 297;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-    let heightLeft = imgHeight;
-    let position = 0;
-
-    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-    heightLeft -= pageHeight;
-
-    while (heightLeft > 0) {
-      position -= pageHeight;
-      pdf.addPage();
-      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
+    try {
+      const { jsPDF } = window.jspdf;
+      const app = document.querySelector(".app-container");
+      const eraOscuro = document.body.classList.contains("modo-oscuro");
+      
+      // Cambiar temporalmente a modo claro para PDF
+      if (eraOscuro) {
+        document.body.classList.remove("modo-oscuro");
+        document.body.classList.add("print-preview");
+      }
+      
+      // Ocultar elementos no deseados
+      document.querySelectorAll('button, .action-buttons, .app-header, .menu-ajustes').forEach(el => {
+        el.style.visibility = 'hidden';
+      });
+      
+      // Configuración optimizada de html2canvas
+      const canvas = await html2canvas(app, {
+        scale: 2,
+        logging: true,
+        useCORS: true,
+        scrollX: 0,
+        scrollY: 0,
+        backgroundColor: '#FFFFFF'
+      });
+      
+      // Restaurar visibilidad
+      document.querySelectorAll('button, .action-buttons, .app-header, .menu-ajustes').forEach(el => {
+        el.style.visibility = '';
+      });
+      
+      // Crear PDF
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+      
+      const imgWidth = 190; // Ancho A4 menos márgenes
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+      
+      // Guardar PDF
+      const fileName = "costeo_" + (platoNombre.value || "plato").replace(/\s+/g, '_') + ".pdf";
+      pdf.save(fileName);
+      
+      // Restaurar modo oscuro si estaba activo
+      if (eraOscuro) {
+        document.body.classList.add("modo-oscuro");
+        document.body.classList.remove("print-preview");
+      }
+    } catch (error) {
+      console.error("Error al generar PDF:", error);
+      alert("Ocurrió un error al generar el PDF. Verifica la consola para más detalles.");
     }
-
-    pdf.save("costeo.pdf");
-    if (eraOscuro) document.body.classList.add("modo-oscuro");
   });
 
   // Cargar datos al iniciar
