@@ -351,4 +351,22 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 
   init();
+// CORRECCIÓN PARA MENÚ DE AJUSTES
+document.addEventListener('DOMContentLoaded', function() {
+  const menuAjustes = document.getElementById('menuAjustes');
+  const abrirAjustes = document.getElementById('abrirAjustes');
+  
+  if (abrirAjustes && menuAjustes) {
+    abrirAjustes.addEventListener('click', function(e) {
+      e.stopPropagation();
+      menuAjustes.classList.toggle('oculto');
+    });
+    
+    document.addEventListener('click', function(e) {
+      if (e.target !== abrirAjustes && !menuAjustes.contains(e.target)) {
+        menuAjustes.classList.add('oculto');
+      }
+    });
+  }
+});
 });
