@@ -382,3 +382,9 @@ document.addEventListener("DOMContentLoaded", function () {
   // Cargar datos al iniciar
   cargarDatos();
 });
+// Ejemplo para el botón de PDF:
+document.getElementById("exportarPDF").addEventListener("click", async function() {
+  this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando...';
+  // ...lógica de generación...
+  this.innerHTML = '<i class="fas fa-file-pdf"></i> Guardar PDF';
+});
