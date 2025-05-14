@@ -377,81 +377,89 @@ document.addEventListener("DOMContentLoaded", function () {
     document.body.removeChild(textarea);
   }
 
-  // Exportar a PDF
-  document.
-  getElementById("exportarPDF").
-  addEventListener("click", async function () {
-    try {
-      const { jsPDF } = window.jspdf;
-      const app = document.querySelector(".app-container");
-      const eraOscuro = document.body.classList.contains("modo-oscuro");
+// Exportar a PDF
+document.getElementById("exportarPDF").addEventListener("click", async function () {
+  try {
+    const { jsPDF } = window.jspdf;
+    const app = document.querySelector(".app-container");
+    const eraOscuro = document.body.classList.contains("modo-oscuro");
+    const platoNombre = document.getElementById("nombrePlato"); // Asegura que esta ID exista
 
-      // Cambiar temporalmente a modo claro para PDF
-      if (eraOscuro) {
-        document.body.classList.remove("modo-oscuro");
-        document.body.classList.add("print-preview");
-      }
+    // Cambiar temporalmente a modo claro para PDF
+    if (eraOscuro) {
+      document.body.classList.remove("modo-oscuro");
+      document.body.classList.add("print-preview");
+    }
 
-      // Ocultar elementos no deseados
-      document.
-      querySelectorAll(
-      "button, .action-buttons, .app-header, .menu-ajustes").
-
-      forEach(el => {
+    // Ocultar elementos no deseados
+    document.querySelectorAll("button, .action-buttons, .app-header, .menu-ajustes")
+      .forEach(el => {
         el.style.visibility = "hidden";
       });
 
-      // Configuración optimizada de html2canvas
-      const canvas = await html2canvas(app, {
-        scale: 2,
-        logging: true,
-        useCORS: true,
-        scrollX: 0,
-        scrollY: 0,
-        backgroundColor: "#FFFFFF" });
+    // Capturar imagen del contenedor
+    const canvas = await html2canvas(app, {
+      scale: 2,
+      logging: false,
+      useCORS: true,
+      scrollX: 0,
+      scrollY: 0,
+      backgroundColor: "#FFFFFF"
+    });
 
-
-      // Restaurar visibilidad
-      document.
-      querySelectorAll(
-      "button, .action-buttons, .app-header, .menu-ajustes").
-
-      forEach(el => {
+    // Restaurar visibilidad
+    document.querySelectorAll("button, .action-buttons, .app-header, .menu-ajustes")
+      .forEach(el => {
         el.style.visibility = "";
       });
 
-      // Crear PDF
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF({
-        orientation: "portrait",
-        unit: "mm",
-        format: "a4" });
+    // Crear PDF
+    const imgData = canvas.toDataURL("image/png");
+    const pdf = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4"
+    });
 
+    const imgWidth = 190; // A4 width - margins
+    const imgHeight = canvas.height * imgWidth / canvas.width;
 
-      const imgWidth = 190; // Ancho A4 menos márgenes
-      const imgHeight = canvas.height * imgWidth / canvas.width;
+    // Si la imagen es más alta que una página, dividir
+    if (imgHeight > 277) {
+      let position = 10;
+      let remainingHeight = imgHeight;
+      const pageHeight = 287;
 
-      pdf.addImage(imgData, "PNG", 10, 10, imgWidth, imgHeight);
-
-      // Guardar PDF
-      const fileName =
-      "costeo_" +
-      (platoNombre.value || "plato").replace(/\s+/g, "_") +
-      ".pdf";
-      pdf.save(fileName);
-
-      // Restaurar modo oscuro si estaba activo
-      if (eraOscuro) {
-        document.body.classList.add("modo-oscuro");
-        document.body.classList.remove("print-preview");
+      while (remainingHeight > 0) {
+        pdf.addImage(imgData, "PNG", 10, position, imgWidth, imgHeight);
+        remainingHeight -= pageHeight;
+        if (remainingHeight > 0) {
+          pdf.addPage();
+          position = 0;
+        }
       }
-    } catch (error) {
-      console.error("Error al generar PDF:", error);
-      alert(
-      "Ocurrió un error al generar el PDF. Verifica la consola para más detalles.");
-
+    } else {
+      pdf.addImage(imgData, "PNG", 10, 10, imgWidth, imgHeight);
     }
-  });
+
+    // Guardar PDF
+    const fileName =
+      "costeo_" +
+      (platoNombre?.value || "plato").trim().replace(/\s+/g, "_") +
+      ".pdf";
+    pdf.save(fileName);
+
+    // Restaurar modo oscuro si estaba activo
+    if (eraOscuro) {
+      document.body.classList.add("modo-oscuro");
+      document.body.classList.remove("print-preview");
+    }
+  } catch (error) {
+    console.error("Error al generar PDF:", error);
+    alert("Ocurrió un error al generar el PDF. Verifica la consola para más detalles.");
+  }
+});
+
 
   // Cargar datos al iniciar
   cargarDatos();
