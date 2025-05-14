@@ -1,383 +1,354 @@
-// script.js COMPLETO para CodePen - Junio 2024
-
-// Variables globales
+// ====================== [CONFIGURACIÓN INICIAL] ======================
 let ingredients = [];
 let operationalCosts = [];
 let currentCalcInput = "";
 const STORAGE_KEY = "costeoData";
 
-// Inicialización cuando el DOM esté listo
-document.addEventListener("DOMContentLoaded", function () {
+// ====================== [INICIALIZACIÓN] ======================
+document.addEventListener("DOMContentLoaded", function() {
+  // ====================== [1. ELEMENTOS DEL DOM] ======================
+  const elementos = {
+    // Sección Principal
+    appContainer: document.querySelector(".app-container"),
+    
+    // Formularios
+    platoNombre: document.getElementById("platoNombre"),
+    platoDescripcion: document.getElementById("platoDescripcion"),
+    margenGanancia: document.getElementById("margenGanancia"),
+    imagePreview: document.getElementById("imagePreview"),
+    imageInput: document.getElementById("platoImage"),
+    
+    // Tablas
+    ingredientesBody: document.getElementById("ingredientesBody"),
+    costosBody: document.getElementById("costosBody"),
+    totalIngredientes: document.getElementById("totalIngredientes"),
+    totalCostos: document.getElementById("totalCostos"),
+    costoPlato: document.getElementById("costoPlato"),
+    precioPersona: document.getElementById("precioPersona"),
+    
+    // Menú y Modales
+    abrirAjustes: document.getElementById("abrirAjustes"),
+    menuAjustes: document.getElementById("menuAjustes"),
+    calcModal: document.getElementById("modalCalculadora"),
+    display: document.getElementById("calcDisplay"),
+    modalHistorial: document.getElementById("modalHistorial"),
+    listaRecetas: document.getElementById("listaRecetas")
+  };
 
-  // Cargar elementos del DOM
-  const ingredientesBody = document.getElementById("ingredientesBody");
-  const costosBody = document.getElementById("costosBody");
-  const totalIngredientes = document.getElementById("totalIngredientes");
-  const totalCostos = document.getElementById("totalCostos");
-  const costoPlato = document.getElementById("costoPlato");
-  const precioPersona = document.getElementById("precioPersona");
-  const margenGanancia = document.getElementById("margenGanancia");
-  const platoNombre = document.getElementById("platoNombre");
-  const platoDescripcion = document.getElementById("platoDescripcion");
-  const imagePreview = document.getElementById("imagePreview");
-  const imageInput = document.getElementById("platoImage");
-  const abrirAjustes = document.getElementById("abrirAjustes");
-  const menuAjustes = document.getElementById("menuAjustes");
-  const calcModal = document.getElementById("modalCalculadora");
-  const display = document.getElementById("calcDisplay");
+  // Validación de elementos críticos
+  if (!elementos.appContainer) {
+    console.error("Error: No se encontró el contenedor principal");
+    return;
+  }
 
-  // Cargar datos guardados
+  // ====================== [2. FUNCIONES CORE] ======================
+  
+  // ----- [2.1] Sistema de Guardado -----
   function cargarDatos() {
-    const datosGuardados = localStorage.getItem(STORAGE_KEY);
-    if (datosGuardados) {
+    try {
+      const datosGuardados = localStorage.getItem(STORAGE_KEY);
+      if (!datosGuardados) return;
+
       const datos = JSON.parse(datosGuardados);
-      ingredients = datos.ingredients || [];
-      operationalCosts = datos.operationalCosts || [];
-      if (datos.platoNombre) platoNombre.value = datos.platoNombre;
-      if (datos.platoDescripcion) platoDescripcion.value = datos.platoDescripcion;
-      if (datos.margenGanancia) margenGanancia.value = datos.margenGanancia;
+      
+      // Migración desde versiones antiguas
+      if (!datos.version) {
+        ingredients = datos.ingredients || [];
+        operationalCosts = datos.operationalCosts || [];
+      } else {
+        ingredients = datos.ingredientes || datos.ingredients || [];
+        operationalCosts = datos.costosOperativos || datos.operationalCosts || [];
+      }
+
+      if (elementos.platoNombre) elementos.platoNombre.value = datos.platoNombre || datos.nombre || "";
+      if (elementos.platoDescripcion) elementos.platoDescripcion.value = datos.platoDescripcion || datos.descripcion || "";
+      if (elementos.margenGanancia) elementos.margenGanancia.value = datos.margenGanancia || datos.margen || 100;
+      if (elementos.imagePreview && datos.imageData) {
+        elementos.imagePreview.innerHTML = `<img src="${datos.imageData}" alt="${datos.platoNombre || 'Plato'}">`;
+      }
+
       renderIngredientes();
       renderCostos();
       calcularTotales();
+    } catch (error) {
+      console.error("Error al cargar datos:", error);
+      localStorage.removeItem(STORAGE_KEY); // Limpia datos corruptos
     }
   }
 
-  // Guardar datos
   function guardarDatos() {
-    const datos = {
-      ingredients,
-      operationalCosts,
-      platoNombre: platoNombre.value,
-      platoDescripcion: platoDescripcion.value,
-      margenGanancia: margenGanancia.value };
-
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(datos));
-  }
-
-  // Manejo de imagen
-  imagePreview.addEventListener("click", () => imageInput.click());
-  imageInput.addEventListener("change", function () {
-    const file = this.files[0];
-    if (file && file.type.startsWith("image/") && file.size <= 2 * 1024 * 1024) {
-      const reader = new FileReader();
-      reader.onload = function () {
-        imagePreview.innerHTML = `<img src="${reader.result}" alt="Plato">`;
+    try {
+      const imageData = elementos.imagePreview?.querySelector("img")?.src || "";
+      const datos = {
+        version: 2,
+        nombre: elementos.platoNombre?.value || "",
+        descripcion: elementos.platoDescripcion?.value || "",
+        ingredientes: ingredients,
+        costosOperativos: operationalCosts,
+        margen: parseFloat(elementos.margenGanancia?.value) || 100,
+        imageData,
+        fechaActualizacion: new Date().toISOString()
       };
-      reader.readAsDataURL(file);
-    } else {
-      alert("Imagen inválida o demasiado grande (máx. 2MB)");
+      
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(datos));
+    } catch (error) {
+      console.error("Error al guardar:", error);
     }
-  });
+  }
 
-  // Agregar ingrediente
-  document.getElementById("agregarIngrediente").addEventListener("click", function () {
-    const nombre = document.getElementById("ingredienteNombre").value.trim();
-    const cantidad = parseFloat(document.getElementById("ingredienteCantidad").value);
-    const unidad = document.getElementById("ingredienteUnidad").value;
-    const presentacion = document.getElementById("ingredientePresentacion").value.trim();
-    const precio = parseFloat(document.getElementById("ingredientePrecio").value);
+  // ----- [2.2] Sistema de Exportación/Importación -----
+  function exportarAJson() {
+    try {
+      const datos = {
+        version: 2,
+        nombre: elementos.platoNombre?.value || "",
+        descripcion: elementos.platoDescripcion?.value || "",
+        ingredientes: ingredients,
+        costosOperativos: operationalCosts,
+        margen: parseFloat(elementos.margenGanancia?.value) || 100,
+        imagen: elementos.imagePreview?.querySelector("img")?.src || "",
+        fechaExportacion: new Date().toISOString()
+      };
 
-    if (!nombre || isNaN(cantidad) || isNaN(precio) || !presentacion) {
-      alert("Completa todos los campos del ingrediente.");
-      return;
+      const blob = new Blob([JSON.stringify(datos, null, 2)], {type: "application/json"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `costeo_${elementos.platoNombre?.value || "receta"}_${new Date().getTime()}.json`;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 100);
+    } catch (error) {
+      console.error("Error al exportar:", error);
+      alert("Error al exportar la receta");
     }
+  }
 
-    const match = presentacion.match(/(\d+(?:\.\d+)?)(\s*)(kg|gr|un)/i);
-    if (!match) {
-      alert("Formato inválido. Ej: 1kg, 500gr, 12 un");
-      return;
-    }
+  function importarDesdeJson(event) {
+    const file = event.target.files[0];
+    if (!file) return;
 
-    let valorPresentacion = parseFloat(match[1]);
-    let unidadPres = match[3].toLowerCase();
-    if (unidadPres === "kg") valorPresentacion *= 1000;
-    let cantidadReal = unidad === "kg" ? cantidad * 1000 : cantidad;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const datos = JSON.parse(e.target.result);
+        
+        // Validación básica
+        if (!datos.ingredientes && !datos.ingredients) {
+          throw new Error("Formato inválido: No se encontraron ingredientes");
+        }
 
-    let precioUnitario = precio / valorPresentacion;
-    const costo = cantidadReal * precioUnitario;
+        // Migración desde versiones antiguas
+        ingredients = datos.ingredientes || datos.ingredients || [];
+        operationalCosts = datos.costosOperativos || datos.operationalCosts || [];
+        
+        if (elementos.platoNombre) elementos.platoNombre.value = datos.nombre || datos.platoNombre || "";
+        if (elementos.platoDescripcion) elementos.platoDescripcion.value = datos.descripcion || datos.platoDescripcion || "";
+        if (elementos.margenGanancia) elementos.margenGanancia.value = datos.margen || datos.margenGanancia || 100;
+        
+        if (elementos.imagePreview) {
+          elementos.imagePreview.innerHTML = datos.imagen ? 
+            `<img src="${datos.imagen}" alt="${datos.nombre || 'Plato'}">` : 
+            `<i class="fas fa-camera"></i><span>+ Agregar foto</span>`;
+        }
 
-    ingredients.push({ nombre, cantidad, unidad, presentacion, precio, costo });
-    renderIngredientes();
-    guardarDatos();
-  });
+        renderIngredientes();
+        renderCostos();
+        calcularTotales();
+        guardarDatos();
+        
+        alert(`Receta "${datos.nombre || datos.platoNombre || 'sin nombre'}" cargada correctamente`);
+      } catch (error) {
+        console.error("Error al importar:", error);
+        alert(`Error al importar: ${error.message}`);
+      }
+    };
+    reader.readAsText(file);
+  }
 
-  // Mostrar ingredientes
+  // ----- [2.3] Renderizado -----
   function renderIngredientes() {
-    ingredientesBody.innerHTML = "";
+    if (!elementos.ingredientesBody) return;
+    
+    elementos.ingredientesBody.innerHTML = "";
     let total = 0;
+    
     ingredients.forEach((ing, i) => {
-      total += ing.costo;
-      ingredientesBody.innerHTML += `
-        <tr>
-          <td>${ing.nombre}</td>
-          <td>${ing.cantidad} ${ing.unidad}</td>
-          <td>$${ing.precio.toFixed(2)}</td>
-          <td>$${ing.costo.toFixed(2)}</td>
-          <td><button onclick="(() => { const index = ${i}; ingredients.splice(index, 1); renderIngredientes(); })()"><i class="fas fa-trash"></i></button></td>
-        </tr>`;
+      total += ing.costo || 0;
+      const row = document.createElement("tr");
+      row.dataset.index = i;
+      row.innerHTML = `
+        <td>${ing.nombre || "Sin nombre"}</td>
+        <td>${ing.cantidad || 0} ${ing.unidad || "gr"}</td>
+        <td>$${(ing.precio || 0).toFixed(2)}</td>
+        <td>$${(ing.costo || 0).toFixed(2)}</td>
+        <td><button class="btn-eliminar"><i class="fas fa-trash"></i></button></td>
+      `;
+      elementos.ingredientesBody.appendChild(row);
     });
-    totalIngredientes.textContent = `$${total.toFixed(2)}`;
-    calcularTotales();
-  }
-
-  // Eliminar ingrediente
-  window.eliminarIngrediente = function (i) {
-    ingredients.splice(i, 1);
-    renderIngredientes();
-    guardarDatos();
-  };
-
-  // Agregar costo operativo
-  document.getElementById("agregarCosto").addEventListener("click", function () {
-    const concepto = document.getElementById("costoConcepto").value.trim();
-    const valor = parseFloat(document.getElementById("costoValor").value);
-    const prorratear = document.getElementById("costoProrratear").checked;
-
-    if (!concepto || isNaN(valor)) {
-      alert("Completa los campos del costo operativo.");
-      return;
+    
+    if (elementos.totalIngredientes) {
+      elementos.totalIngredientes.textContent = `$${total.toFixed(2)}`;
     }
-
-    const valorFinal = prorratear ? valor / 30 : valor;
-    operationalCosts.push({ concepto, valor: valorFinal });
-    renderCostos();
-    guardarDatos();
-  });
-
-  // Mostrar costos
-  function renderCostos() {
-    costosBody.innerHTML = "";
-    let total = 0;
-    operationalCosts.forEach((costo, i) => {
-      total += costo.valor;
-      costosBody.innerHTML += `
-        <tr>
-          <td>${costo.concepto}</td>
-          <td>$${costo.valor.toFixed(2)}</td>
-          <td><button onclick="eliminarCosto(${i})"><i class="fas fa-trash"></i></button></td>
-        </tr>`;
-    });
-    totalCostos.textContent = `$${total.toFixed(2)}`;
-    calcularTotales();
   }
 
-  // Eliminar costo
-  window.eliminarCosto = function (i) {
-    operationalCosts.splice(i, 1);
-    renderCostos();
-    guardarDatos();
-  };
+  function renderCostos() {
+    if (!elementos.costosBody) return;
+    
+    elementos.costosBody.innerHTML = "";
+    let total = 0;
+    
+    operationalCosts.forEach((costo, i) => {
+      total += costo.valor || 0;
+      const row = document.createElement("tr");
+      row.dataset.index = i;
+      row.innerHTML = `
+        <td>${costo.concepto || "Sin concepto"}</td>
+        <td>$${(costo.valor || 0).toFixed(2)}</td>
+        <td><button class="btn-eliminar"><i class="fas fa-trash"></i></button></td>
+      `;
+      elementos.costosBody.appendChild(row);
+    });
+    
+    if (elementos.totalCostos) {
+      elementos.totalCostos.textContent = `$${total.toFixed(2)}`;
+    }
+  }
 
-  // Calcular totales
+  // ----- [2.4] Cálculos -----
   function calcularTotales() {
-    const totalIng = ingredients.reduce((sum, ing) => sum + ing.costo, 0);
-    const totalOps = operationalCosts.reduce((sum, costo) => sum + costo.valor, 0);
+    const totalIng = ingredients.reduce((sum, ing) => sum + (ing.costo || 0), 0);
+    const totalOps = operationalCosts.reduce((sum, costo) => sum + (costo.valor || 0), 0);
     const costoTotal = totalIng + totalOps;
-    const margen = parseFloat(margenGanancia.value) || 0;
+    const margen = parseFloat(elementos.margenGanancia?.value) || 0;
     const precio = costoTotal * (1 + margen / 100);
 
-    costoPlato.textContent = `$${costoTotal.toFixed(2)}`;
-    precioPersona.textContent = `$${precio.toFixed(2)}`;
+    if (elementos.costoPlato) elementos.costoPlato.textContent = `$${costoTotal.toFixed(2)}`;
+    if (elementos.precioPersona) elementos.precioPersona.textContent = `$${precio.toFixed(2)}`;
+    
     guardarDatos();
   }
 
-  margenGanancia.addEventListener("input", calcularTotales);
-
-  // Menú de ajustes
-  abrirAjustes.addEventListener("click", function (e) {
-    e.stopPropagation();
-    menuAjustes.classList.toggle("oculto");
-  });
-
-  document.addEventListener("click", function (e) {
-    if (!menuAjustes.contains(e.target) && e.target !== abrirAjustes) {
-      menuAjustes.classList.add("oculto");
-    }
-  });
-
-  // Modo oscuro
-  document.getElementById("alternarTema").addEventListener("click", function () {
-    document.body.classList.toggle("modo-oscuro");
-    localStorage.setItem("temaOscuro", document.body.classList.contains("modo-oscuro"));
-  });
-
-  if (localStorage.getItem("temaOscuro") === "true") {
-    document.body.classList.add("modo-oscuro");
-  }
-
-  // Historial
-  document.getElementById("verHistorial").addEventListener("click", function () {
-    const modal = document.getElementById("modalHistorial");
-    const lista = document.getElementById("listaRecetas");
-    lista.innerHTML = "";
-    const historial = JSON.parse(localStorage.getItem("historialCosteos") || "[]");
-
-    historial.forEach((item, i) => {
-      const li = document.createElement("li");
-      li.textContent = `${i + 1}. ${item.nombre || "Plato sin nombre"} - ${item.fecha}`;
-      lista.appendChild(li);
+  // ====================== [3. EVENTOS] ======================
+  
+  // ----- [3.1] Eventos Globales -----
+  function setupEventListeners() {
+    // Eliminación segura de items
+    document.addEventListener("click", function(e) {
+      if (!e.target.closest(".btn-eliminar")) return;
+      
+      const row = e.target.closest("tr");
+      if (!row) return;
+      
+      const index = parseInt(row.dataset.index);
+      if (isNaN(index)) return;
+      
+      if (row.parentElement === elementos.ingredientesBody) {
+        ingredients.splice(index, 1);
+        renderIngredientes();
+      } else if (row.parentElement === elementos.costosBody) {
+        operationalCosts.splice(index, 1);
+        renderCostos();
+      }
+      
+      calcularTotales();
     });
 
-    modal.style.display = "block";
-  });
+    // Menú de ajustes
+    if (elementos.abrirAjustes && elementos.menuAjustes) {
+      elementos.abrirAjustes.addEventListener("click", function(e) {
+        e.stopPropagation();
+        elementos.menuAjustes.classList.toggle("oculto");
+      });
 
-  document.querySelector(".close-modal").addEventListener("click", function () {
-    document.getElementById("modalHistorial").style.display = "none";
-  });
-
-  // Calculadora
-  document.getElementById("abrirCalculadora").addEventListener("click", function () {
-    calcModal.style.display = "block";
-    currentCalcInput = "";
-    display.value = "";
-  });
-
-  document.querySelectorAll(".calc-buttons button").forEach(btn => {
-  btn.addEventListener("click", function() {
-    const value = this.textContent;
-    
-    if (value === "=") {
-      try {
-        currentCalcInput = eval(currentCalcInput).toString();
-      } catch {
-        currentCalcInput = "Error";
-      }
-    } else if (value === "C") {
-      currentCalcInput = "";
-    } else {
-      currentCalcInput += value;
-    }
-    
-    display.value = currentCalcInput;
-    
-    // Nuevo código para el borde de overflow
-    if (display.scrollWidth > display.clientWidth) {
-      display.style.boxShadow = 'inset 0 0 0 2px #ff6b6b';
-      display.scrollLeft = display.scrollWidth; // Auto-scroll al final
-    } else {
-      display.style.boxShadow = 'none';
-      display.scrollLeft = 0;
-    }
-  });
-
-  // Guardar costeo
-  document.getElementById("guardarCosteo").addEventListener("click", function () {
-    guardarDatos();
-
-    // Guardar en historial
-    const historial = JSON.parse(localStorage.getItem("historialCosteos") || "[]");
-    historial.unshift({
-      nombre: platoNombre.value || "Plato sin nombre",
-      fecha: new Date().toLocaleDateString(),
-      costo: costoPlato.textContent,
-      precio: precioPersona.textContent });
-
-
-    localStorage.setItem("historialCosteos", JSON.stringify(historial));
-    alert("Costeo guardado en el historial");
-  });
-
-  // Compartir costeo
-  document.getElementById("compartirCosteo").addEventListener("click", function () {
-    guardarDatos();
-
-    const resumen = `🍽️ ${platoNombre.value || "Plato sin nombre"}\n` +
-    `📝 ${platoDescripcion.value || "Sin descripción"}\n\n` +
-    `💰 Costo: ${costoPlato.textContent}\n` +
-    `💲 Precio: ${precioPersona.textContent}\n\n` +
-    `📅 ${new Date().toLocaleDateString()}`;
-
-    if (navigator.share) {
-      navigator.share({
-        title: 'Mi costeo gastronómico',
-        text: resumen,
-        url: window.location.href }).
-      catch(() => copiarAlPortapapeles(resumen));
-    } else {
-      copiarAlPortapapeles(resumen);
-    }
-  });
-
-  function copiarAlPortapapeles(texto) {
-    const textarea = document.createElement('textarea');
-    textarea.value = texto;
-    document.body.appendChild(textarea);
-    textarea.select();
-
-    try {
-      document.execCommand('copy');
-      alert("Resumen copiado al portapapeles. Pégalo donde quieras compartirlo.");
-    } catch (err) {
-      alert("No se pudo copiar automáticamente. Selecciona y copia manualmente este texto:\n\n" + texto);
+      document.addEventListener("click", function(e) {
+        if (elementos.menuAjustes.contains(e.target) || e.target === elementos.abrirAjustes) return;
+        elementos.menuAjustes.classList.add("oculto");
+      });
     }
 
-    document.body.removeChild(textarea);
+    // Calculadora
+    if (elementos.calcModal && elementos.display) {
+      const calcButtons = document.querySelectorAll(".calc-buttons button");
+      calcButtons.forEach(btn => {
+        btn.addEventListener("click", function() {
+          const value = this.textContent;
+          if (value === "=") {
+            try {
+              currentCalcInput = eval(currentCalcInput).toString();
+            } catch {
+              currentCalcInput = "Error";
+            }
+          } else if (value === "C") {
+            currentCalcInput = "";
+          } else {
+            currentCalcInput += value;
+          }
+          elementos.display.value = currentCalcInput;
+        });
+      });
+    }
+
+    // Imagen
+    if (elementos.imagePreview && elementos.imageInput) {
+      elementos.imagePreview.addEventListener("click", () => elementos.imageInput.click());
+      elementos.imageInput.addEventListener("change", function() {
+        const file = this.files[0];
+        if (!file || !file.type.startsWith("image/")) return;
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          elementos.imagePreview.innerHTML = `<img src="${e.target.result}" alt="Imagen del plato">`;
+          guardarDatos();
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // Margen
+    if (elementos.margenGanancia) {
+      elementos.margenGanancia.addEventListener("input", calcularTotales);
+    }
   }
 
-  // Exportar a PDF - VERSIÓN MEJORADA
-  document.getElementById("exportarPDF").addEventListener("click", async function () {
-    try {
-      const { jsPDF } = window.jspdf;
-      const app = document.querySelector(".app-container");
-      const eraOscuro = document.body.classList.contains("modo-oscuro");
+  // ----- [3.2] Botones de Acción -----
+  function setupActionButtons() {
+    const actionButtons = document.querySelector(".action-buttons");
+    if (!actionButtons) return;
 
-      // Crear un clon del contenido para evitar problemas de renderizado
-      const clone = app.cloneNode(true);
-      clone.style.position = 'absolute';
-      clone.style.left = '-9999px';
-      clone.style.width = '210mm'; // Ancho A4
-      document.body.appendChild(clone);
+    // Botón Exportar
+    const exportBtn = document.createElement("button");
+    exportBtn.className = "btn-action";
+    exportBtn.innerHTML = '<i class="fas fa-file-export"></i> Exportar';
+    exportBtn.addEventListener("click", exportarAJson);
 
-      // Configuración mejorada de html2canvas
-      // Reemplaza la configuración de html2canvas por:
-const canvas = await html2canvas(app, {
-  scale: 1.8, // ↑ Aumenté para mejor calidad
-  useCORS: true,
-  logging: false,
-  ignoreElements: (el) => el.classList.contains('no-print'),
-  onclone: (clonedDoc) => {
-    clonedDoc.body.classList.add('printing-pdf');
-    if (eraOscuro) clonedDoc.body.classList.remove('modo-oscuro');
+    // Botón Importar
+    const importInput = document.createElement("input");
+    importInput.type = "file";
+    importInput.accept = ".json";
+    importInput.style.display = "none";
+    importInput.addEventListener("change", importarDesdeJson);
+
+    const importBtn = document.createElement("button");
+    importBtn.className = "btn-action";
+    importBtn.innerHTML = '<i class="fas fa-file-import"></i> Importar';
+    importBtn.addEventListener("click", () => importInput.click());
+
+    // Insertar botones
+    actionButtons.prepend(importInput);
+    actionButtons.prepend(importBtn);
+    actionButtons.prepend(exportBtn);
   }
-});
 
+  // ====================== [INICIALIZACIÓN FINAL] ======================
+  function init() {
+    setupEventListeners();
+    setupActionButtons();
+    cargarDatos();
+  }
 
-      const imgWidth = 190; // Ancho A4 menos márgenes (210 - 20)
-      const imgHeight = canvas.height * imgWidth / canvas.width;
-
-      // Margen superior de 10mm
-      let position = 10;
-      const pageHeight = 277; // Altura A4 menos márgenes (297 - 20)
-
-      // Agregar primera página
-      pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight, undefined, 'FAST');
-
-      // Si el contenido es más largo que una página
-      let heightLeft = imgHeight + position - pageHeight;
-      while (heightLeft > 0) {
-        pdf.addPage();
-        position = heightLeft - imgHeight;
-        pdf.addImage(imgData, 'PNG', 10, -position, imgWidth, imgHeight, undefined, 'FAST');
-        heightLeft -= pageHeight;
-      }
-
-      pdf.save("costeo_" + (platoNombre.value || "plato").replace(/\s+/g, '_') + ".pdf");
-
-      if (eraOscuro) {
-        document.body.classList.add("modo-oscuro");
-      }
-    } catch (error) {
-      console.error("Error al generar PDF:", error);
-      alert("Ocurrió un error al generar el PDF. Verifica la consola para más detalles.");
-    }
-  });
-
-  // Cargar datos al iniciar
-  cargarDatos();
-});
-// Ejemplo para el botón de PDF:
-document.getElementById("exportarPDF").addEventListener("click", async function() {
-  this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando...';
-  // ...lógica de generación...
-  this.innerHTML = '<i class="fas fa-file-pdf"></i> Guardar PDF';
+  init();
 });
