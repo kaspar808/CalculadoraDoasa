@@ -329,24 +329,17 @@ document.addEventListener("DOMContentLoaded", function () {
       document.body.appendChild(clone);
 
       // Configuración mejorada de html2canvas
-      const canvas = await html2canvas(clone, {
-        scale: 2,
-        logging: true,
-        useCORS: true,
-        allowTaint: true,
-        scrollX: 0,
-        scrollY: 0,
-        windowWidth: clone.scrollWidth,
-        windowHeight: clone.scrollHeight });
-
-
-      document.body.removeChild(clone);
-
-      const imgData = canvas.toDataURL("image/png", 1.0);
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4' });
+      // Reemplaza la configuración de html2canvas por:
+const canvas = await html2canvas(app, {
+  scale: 1.8, // ↑ Aumenté para mejor calidad
+  useCORS: true,
+  logging: false,
+  ignoreElements: (el) => el.classList.contains('no-print'),
+  onclone: (clonedDoc) => {
+    clonedDoc.body.classList.add('printing-pdf');
+    if (eraOscuro) clonedDoc.body.classList.remove('modo-oscuro');
+  }
+});
 
 
       const imgWidth = 190; // Ancho A4 menos márgenes (210 - 20)
