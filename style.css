@@ -430,4 +430,9 @@ body.modo-oscuro .menu-ajustes button:hover {
 #platoDescripcion {
   min-height: 80px; /* Área más grande para escribir */
 }
+@media (max-width: 768px) {
+  .card-header { flex-direction: column; }
+  .table-container { overflow-x: auto; }
+}
+
 }
