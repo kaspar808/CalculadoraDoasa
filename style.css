@@ -365,3 +365,16 @@ body.modo-oscuro .menu-ajustes button:hover {
     background: #FFF !important;
   }
 }
+/* Fuerza colores legibles en PDF */
+@media print {
+  body.modo-oscuro .app-container,
+  body.modo-oscuro .plato-card,
+  body.modo-oscuro table {
+    background: white !important;
+    color: black !important;
+  }
+  
+  body.modo-oscuro .result-card.highlight {
+    background: #FFF3B8 !important;
+  }
+}
