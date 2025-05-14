@@ -346,8 +346,6 @@ body.modo-oscuro .modal-content {
 body.modo-oscuro #listaRecetas {
   color: var(--color3);
 }
-
-/* ===== Estilos para PDF ===== */
 @media print {
   body * {
     visibility: hidden;
@@ -388,7 +386,6 @@ body.modo-oscuro #listaRecetas {
     page-break-inside: avoid;
     page-break-after: auto;
   }
-/* Versión móvil (≤ 768px) */
 @media (max-width: 768px) {
   .card-header {
     flex-direction: column; /* Apila elementos verticalmente */
@@ -410,7 +407,6 @@ body.modo-oscuro #listaRecetas {
   .card-info {
     width: 100% !important;
   }
-/* Ajustes adicionales (opcionales) */
 .card-title {
   font-size: 1.4rem !important; /* Título más grande en móvil */
   text-align: center;
