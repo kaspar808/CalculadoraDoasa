@@ -390,3 +390,11 @@ body.modo-oscuro .menu-ajustes button:hover {
     object-fit: contain !important;
   }
 }
+#calcDisplay::-webkit-scrollbar {
+  height: 5px;
+}
+
+#calcDisplay::-webkit-scrollbar-thumb {
+  background: var(--color4);
+  border-radius: 5px;
+}
