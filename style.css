@@ -343,3 +343,15 @@ body.modo-oscuro .menu-ajustes button:hover {
     page-break-inside: avoid;
   }
 }
+@media print {
+  .image-preview {
+    max-width: 2cm !important;
+    max-height: 2cm !important;
+  }
+}
+@media print {
+  body {
+    color: #000 !important;
+    background: #FFF !important;
+  }
+}
