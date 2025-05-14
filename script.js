@@ -113,7 +113,7 @@ document.addEventListener("DOMContentLoaded", function () {
           <td>${ing.cantidad} ${ing.unidad}</td>
           <td>$${ing.precio.toFixed(2)}</td>
           <td>$${ing.costo.toFixed(2)}</td>
-          <td><button onclick="eliminarIngrediente(${i})"><i class="fas fa-trash"></i></button></td>
+          <td><button onclick="(() => { const index = ${i}; ingredients.splice(index, 1); renderIngredientes(); })()"><i class="fas fa-trash"></i></button></td>
         </tr>`;
     });
     totalIngredientes.textContent = `$${total.toFixed(2)}`;
