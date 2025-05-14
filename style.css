@@ -394,3 +394,55 @@ body.modo-oscuro #listaRecetas {
     height: auto !important;
   }
 https://calculador-costes.netlify.app/
+@media (max-width: 768px) {
+  .plato-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .card-header {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .image-upload {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  .image-preview {
+    width: 100%;
+    max-width: 300px;
+    height: 300px;
+    object-fit: cover;
+    background-size: cover;
+    background-position: center;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+
+  .card-info {
+    width: 100%;
+    padding: 0 1rem;
+    text-align: center;
+  }
+
+  #platoNombre.card-title {
+    font-size: 1.4rem;
+    margin-bottom: 0.5rem;
+    text-align: center;
+  }
+
+  #platoDescripcion {
+    font-size: 1rem;
+    resize: vertical;
+    width: 100%;
+    min-height: 80px;
+  }
+}
+
