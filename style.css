@@ -355,3 +355,9 @@ body.modo-oscuro .menu-ajustes button:hover {
     background: #FFF !important;
   }
 }
+@media print {
+  body, body * {
+    color: #000 !important;
+    background: #FFF !important;
+  }
+}
