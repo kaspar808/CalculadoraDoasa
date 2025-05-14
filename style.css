@@ -398,3 +398,26 @@ body.modo-oscuro .menu-ajustes button:hover {
   background: var(--color4);
   border-radius: 5px;
 }
+/* Versión móvil (≤ 768px) */
+@media (max-width: 768px) {
+  .card-header {
+    flex-direction: column; /* Apila elementos verticalmente */
+    gap: 15px !important;
+  }
+
+  .image-upload {
+    width: 100% !important;
+    display: flex;
+    justify-content: center;
+  }
+
+  .image-preview {
+    width: 150px !important; /* Tamaño más apropiado para móvil */
+    height: 150px !important;
+    margin: 0 auto; /* Centra la imagen */
+  }
+
+  .card-info {
+    width: 100% !important;
+  }
+}
