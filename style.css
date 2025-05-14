@@ -378,3 +378,15 @@ body.modo-oscuro .menu-ajustes button:hover {
     background: #FFF3B8 !important;
   }
 }
+@media print {
+  .image-preview {
+    max-width: 2.5cm !important;
+    height: auto !important;
+    margin: 0 auto 0.5cm !important;
+    display: block !important;
+  }
+  
+  .image-preview img {
+    object-fit: contain !important;
+  }
+}
