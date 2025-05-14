@@ -454,7 +454,51 @@ body {
   .result-grid {
     flex-direction: column;
   }
+@media (max-width: 768px) {
+  .card-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .image-upload {
+    width: 100%;
+    max-width: 300px;
+    margin-bottom: 1rem;
+  }
+
+  .image-preview {
+    height: 300px;
+    width: 100%;
+    object-fit: cover;
+    border-radius: 1rem;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+
+  .card-info {
+    width: 100%;
+    padding: 0 1rem;
+  }
+
+  #platoNombre.card-title {
+    font-size: 1.4rem;
+    margin-bottom: 0.5rem;
+    text-align: center;
+  }
+
+  #platoDescripcion {
+    min-height: 80px;
+    font-size: 1rem;
+    resize: vertical;
+    width: 100%;
+  }
 }
+
 
 
 }
