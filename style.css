@@ -412,8 +412,8 @@ body.modo-oscuro .menu-ajustes button:hover {
   }
 
   .image-preview {
-    width: 150px !important; /* Tamaño más apropiado para móvil */
-    height: 150px !important;
+    width: 200px !important; /* Tamaño más apropiado para móvil */
+    height: 200px !important;
     margin: 0 auto; /* Centra la imagen */
   }
 
