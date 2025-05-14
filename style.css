@@ -402,12 +402,21 @@ body.modo-oscuro #listaRecetas {
   }
 
   .image-preview {
-    width: 150px !important; /* Tamaño más apropiado para móvil */
-    height: 150px !important;
+    width: 300px !important; /* Tamaño más apropiado para móvil */
+    height: 300px !important;
     margin: 0 auto; /* Centra la imagen */
   }
 
   .card-info {
     width: 100% !important;
   }
+/* Ajustes adicionales (opcionales) */
+.card-title {
+  font-size: 1.4rem !important; /* Título más grande en móvil */
+  text-align: center;
+}
+
+#platoDescripcion {
+  min-height: 80px; /* Área más grande para escribir */
+}
 }
