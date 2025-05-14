@@ -335,3 +335,11 @@ body.modo-oscuro .menu-ajustes button {
 body.modo-oscuro .menu-ajustes button:hover {
   background-color: #444;
 }
+@media print {
+  .app-container {
+    margin: 2cm !important;
+  }
+  table { 
+    page-break-inside: avoid;
+  }
+}
