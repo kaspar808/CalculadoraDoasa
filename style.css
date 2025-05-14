@@ -292,32 +292,32 @@ select {
 
 .calculadora-modal {
   width: 300px;
+  padding: 15px;
+  box-sizing: border-box; /* ¡Clave para el fix! */
 }
 
 #calcDisplay {
   width: 100%;
+  box-sizing: border-box; /* Asegura que el padding no afecte el ancho */
+  padding: 10px 15px;
   font-size: 1.5rem;
-  padding: 10px;
   text-align: right;
+  border: 2px solid #ddd;
+  border-radius: var(--border-radius);
+  margin-bottom: 10px;
+  overflow-x: auto; /* Permite scroll horizontal si el contenido es largo */
+  white-space: nowrap; /* Evita saltos de línea */
 }
 
 .calc-buttons {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 5px;
+  gap: 8px;
 }
 
 .calc-buttons button {
-  padding: 12px;
-  font-size: 1rem;
-  cursor: pointer;
-}
-
-.close-modal,
-.close-calculadora {
-  float: right;
-  font-size: 1.5rem;
-  cursor: pointer;
+  padding: 12px 0;
+  font-size: 1.1rem;
 }
 
 body.modo-oscuro {
