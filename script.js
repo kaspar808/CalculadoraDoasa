@@ -232,32 +232,32 @@ document.addEventListener("DOMContentLoaded", function () {
     display.value = "";
   });
 
-  document.querySelector(".close-calculadora").addEventListener("click", function () {
-    calcModal.style.display = "none";
-  });
-
-  window.addEventListener("click", function (e) {
-    if (e.target === calcModal) {
-      calcModal.style.display = "none";
-    }
-  });
-
   document.querySelectorAll(".calc-buttons button").forEach(btn => {
-    btn.addEventListener("click", function () {
-      const value = this.textContent;
-      if (value === "=") {
-        try {
-          currentCalcInput = eval(currentCalcInput).toString();
-        } catch {
-          currentCalcInput = "Error";
-        }
-      } else if (value === "C") {
-        currentCalcInput = "";
-      } else {
-        currentCalcInput += value;
+  btn.addEventListener("click", function() {
+    const value = this.textContent;
+    
+    if (value === "=") {
+      try {
+        currentCalcInput = eval(currentCalcInput).toString();
+      } catch {
+        currentCalcInput = "Error";
       }
-      display.value = currentCalcInput;
-    });
+    } else if (value === "C") {
+      currentCalcInput = "";
+    } else {
+      currentCalcInput += value;
+    }
+    
+    display.value = currentCalcInput;
+    
+    // Nuevo código para el borde de overflow
+    if (display.scrollWidth > display.clientWidth) {
+      display.style.boxShadow = 'inset 0 0 0 2px #ff6b6b';
+      display.scrollLeft = display.scrollWidth; // Auto-scroll al final
+    } else {
+      display.style.boxShadow = 'none';
+      display.scrollLeft = 0;
+    }
   });
 
   // Guardar costeo
