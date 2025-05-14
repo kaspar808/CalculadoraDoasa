@@ -416,4 +416,13 @@ body.modo-oscuro #listaRecetas {
     max-width: 150px !important;
     height: auto !important;
   }
+/* Ajustes adicionales (opcionales) */
+.card-title {
+  font-size: 1.4rem !important; /* Título más grande en móvil */
+  text-align: center;
+}
+
+#platoDescripcion {
+  min-height: 80px; /* Área más grande para escribir */
+}
 }
